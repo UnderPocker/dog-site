@@ -1,10 +1,10 @@
-const breedSelect = document.getElementById('breed-select');
-const subBreedSelect = document.getElementById('sub-breed-select');
-const gallery = document.getElementById('gallery');
-const loader = document.getElementById('loader');
-const randomBtn = document.getElementById('random-btn');
-const search = document.getElementById('search');
-const favorites = document.getElementById('favorites');
+const breedSelect = document.querySelector('#breed-select');
+const subBreedSelect = document.querySelector('#sub-breed-select');
+const gallery = document.querySelector('#gallery');
+const loader = document.querySelector('#loader');
+const randomBtn = document.querySelector('#random-btn');
+const search = document.querySelector('#search');
+const favorites = document.querySelector('#favorites');
 
 let allBreeds = {};
 
@@ -18,7 +18,7 @@ async function fetchBreeds() {
 function updateBreedSelect(filter = '') {
     breedSelect.innerHTML = '<option value="">Выбери породу</option>';
     Object.keys(allBreeds)
-        .filter(b => b.includes(filter.toLowerCase()))
+        .filter(breed => breed.includes(filter.toLowerCase()))
         .forEach(breed => {
             const option = document.createElement('option');
             option.value = breed;
@@ -87,8 +87,6 @@ function renderFavorites() {
         favorites.appendChild(img);
     });
 }
-
-// --- События ---
 
 breedSelect.addEventListener('change', async () => {
     const breed = breedSelect.value;
