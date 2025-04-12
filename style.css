@@ -1,27 +1,54 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: sans-serif;
+  background: #f0f2f5;
   text-align: center;
   padding: 2rem;
-  background-color: #f4f4f4;
 }
 
 h1 {
   font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
 .controls {
-  margin: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 
-select, button {
-  padding: 0.5rem 1rem;
+input, select, button {
+  padding: 0.5rem;
   font-size: 1rem;
-  margin: 0 0.5rem;
 }
 
-#dog-image {
-  max-width: 500px;
+#gallery-container {
+  position: relative;
+}
+
+.loader {
+  display: none;
+  font-size: 1.2rem;
   margin-top: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.gallery img {
+  max-width: 250px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+
+.gallery img:hover {
+  transform: scale(1.05);
+  cursor: pointer;
 }

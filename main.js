@@ -1,42 +1,129 @@
 const breedSelect = document.getElementById('breed-select');
-const randomDogBtn = document.getElementById('random-dog-btn');
-const dogImage = document.getElementById('dog-image');
+const subBreedSelect = document.getElementById('sub-breed-select');
+const gallery = document.getElementById('gallery');
+const loader = document.getElementById('loader');
+const randomBtn = document.getElementById('random-btn');
+const search = document.getElementById('search');
+const favorites = document.getElementById('favorites');
 
-// Получить список пород
+let allBreeds = {};
+
 async function fetchBreeds() {
     const res = await fetch('https://dog.ceo/api/breeds/list/all');
     const data = await res.json();
+    allBreeds = data.message;
+    updateBreedSelect();
+}
 
-    Object.keys(data.message).forEach(breed => {
-        const option = document.createElement('option');
-        option.value = breed;
-        option.textContent = breed.charAt(0).toUpperCase() + breed.slice(1);
-        breedSelect.appendChild(option);
+function updateBreedSelect(filter = '') {
+    breedSelect.innerHTML = '<option value="">Выбери породу</option>';
+    Object.keys(allBreeds)
+        .filter(b => b.includes(filter.toLowerCase()))
+        .forEach(breed => {
+            const option = document.createElement('option');
+            option.value = breed;
+            option.textContent = breed;
+            breedSelect.appendChild(option);
+        });
+}
+
+async function fetchImages(breed, sub = null) {
+    let url = sub
+        ? `https://dog.ceo/api/breed/${breed}/${sub}/images/random/5`
+        : `https://dog.ceo/api/breed/${breed}/images/random/5`;
+    loader.style.display = 'block';
+    gallery.innerHTML = '';
+    const res = await fetch(url);
+    const data = await res.json();
+    loader.style.display = 'none';
+    displayImages(data.message, breed, sub);
+}
+
+function displayImages(images, breed, sub) {
+    gallery.innerHTML = '';
+    images.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = breed;
+        img.title = sub ? `${breed} (${sub})` : breed;
+        img.addEventListener('click', () => saveFavorite(url));
+        gallery.appendChild(img);
     });
 }
 
-// Показать случайную собаку
-async function showRandomDog() {
+async function fetchRandomDog() {
+    loader.style.display = 'block';
+    gallery.innerHTML = '';
     const res = await fetch('https://dog.ceo/api/breeds/image/random');
     const data = await res.json();
-    dogImage.src = data.message;
+    loader.style.display = 'none';
+    const url = data.message;
+    const parts = url.split('/');
+    const breed = parts[parts.indexOf('breeds') + 1];
+    displayImages([url], breed);
 }
 
-// Показать собаку по породе
-async function showBreedDog(breed) {
-    const res = await fetch(`https://dog.ceo/api/breed/${breed}/images/random`);
+async function fetchSubBreeds(breed) {
+    const res = await fetch(`https://dog.ceo/api/breed/${breed}/list`);
     const data = await res.json();
-    dogImage.src = data.message;
+    return data.message;
 }
 
-// События
-randomDogBtn.addEventListener('click', showRandomDog);
-breedSelect.addEventListener('change', (e) => {
-    if (e.target.value) {
-        showBreedDog(e.target.value);
+function saveFavorite(url) {
+    let favs = JSON.parse(localStorage.getItem('favorites')) || [];
+    if (!favs.includes(url)) {
+        favs.push(url);
+        localStorage.setItem('favorites', JSON.stringify(favs));
+        renderFavorites();
     }
+}
+
+function renderFavorites() {
+    favorites.innerHTML = '';
+    const favs = JSON.parse(localStorage.getItem('favorites')) || [];
+    favs.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        favorites.appendChild(img);
+    });
+}
+
+// --- События ---
+
+breedSelect.addEventListener('change', async () => {
+    const breed = breedSelect.value;
+    const subBreeds = await fetchSubBreeds(breed);
+
+    if (subBreeds.length) {
+        subBreedSelect.style.display = 'inline';
+        subBreedSelect.innerHTML = '<option value="">Все подпороды</option>';
+        subBreeds.forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub;
+            opt.textContent = sub;
+            subBreedSelect.appendChild(opt);
+        });
+    } else {
+        subBreedSelect.style.display = 'none';
+    }
+
+    fetchImages(breed);
 });
 
-// Инициализация
-fetchBreeds();
-showRandomDog();
+subBreedSelect.addEventListener('change', () => {
+    const breed = breedSelect.value;
+    const sub = subBreedSelect.value;
+    fetchImages(breed, sub);
+});
+
+randomBtn.addEventListener('click', fetchRandomDog);
+
+search.addEventListener('input', (e) => {
+    updateBreedSelect(e.target.value);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchBreeds();
+    fetchRandomDog();
+    renderFavorites();
+});

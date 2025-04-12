@@ -2,23 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Dog Viewer</title>
+  <title>Dog Viewer Pro</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-<h1>🐶 Dog Viewer</h1>
+<h1>🐶 Dog Viewer Pro</h1>
 
-<section class="controls">
-  <button id="random-dog-btn">Показать случайную собаку</button>
+<div class="controls">
+  <input type="text" id="search" placeholder="Поиск породы..." />
+  <select id="breed-select"><option>Загрузка...</option></select>
+  <select id="sub-breed-select" style="display:none"></select>
+  <button id="random-btn">🎲 Случайная собака</button>
+</div>
 
-  <select id="breed-select">
-    <option value="">Выбери породу</option>
-  </select>
-</section>
+<div id="gallery-container">
+  <div id="loader" class="loader">Загрузка...</div>
+  <div id="gallery" class="gallery"></div>
+</div>
 
-<section id="dog-display">
-  <img id="dog-image" src="" alt="Здесь будет собака" />
-</section>
+<h2>❤️ Избранное</h2>
+<div id="favorites" class="gallery"></div>
 
 <script type="module" src="/main.js"></script>
 </body>
